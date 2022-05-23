@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (c) 2014-present, The osquery authors
+# Copyright (c) 2014-present, The llvm authors
 #
 # This source code is licensed as defined by the LICENSE file found in the
 # root directory of this source tree.
@@ -13,7 +13,7 @@ main() {
   if [[ -z "${run_build_script}" ]] ; then
     startDockerContainer || return 1
   else
-    buildOsqueryToolchain || return 1
+    build_llvmToolchain || return 1
   fi
 
   return 0
@@ -32,10 +32,10 @@ startDockerContainer() {
     fi
   fi
 
-  local container_name="osquery-toolchain-$(git rev-parse HEAD)"
+  local container_name="llvm-toolchain-$(git rev-parse HEAD)"
   docker rm "${container_name}" > /dev/null 2>&1
 
-  docker run --rm -e "run_build_script=1" -v "$(realpath build):/opt/osquery-toolchain" -v "$(pwd):/home/osquery/osquery-toolchain" --name "${container_name}" -it "${BASE_IMAGE}" /bin/bash -c '/home/osquery/osquery-toolchain/build_inside_docker.sh'
+  docker run --rm -e "run_build_script=1" -v "$(realpath build):/opt/llvm-toolchain" -v "$(pwd):/home/llvm/llvm-toolchain" --name "${container_name}" -it "${BASE_IMAGE}" /bin/bash -c '/home/llvm/llvm-toolchain/build_inside_docker.sh'
   if [[ $? != 0 ]] ; then
     echo "Failed to start the Docker container"
     return 1
@@ -44,17 +44,17 @@ startDockerContainer() {
   return 0
 }
 
-buildOsqueryToolchain() {
+build_llvmToolchain() {
   # https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
   local home_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
   cd "${home_folder}"
 
   installSystemDependencies || return 1
   installCMake || return 1
-  initializeOsqueryUser || return 1
+  initialize_llvmUser || return 1
 
   export KEEP_INTERMEDIATE_STAGES=1
-  sudo -u osquery ./build.sh "/opt/osquery-toolchain"
+  sudo -u llvm ./build.sh "/opt/llvm-toolchain"
   if [[ $? != 0 ]] ; then
     echo "The build script has failed"
     return 1
@@ -63,14 +63,14 @@ buildOsqueryToolchain() {
   return 0
 }
 
-initializeOsqueryUser() {
-  useradd -d "/home/osquery" -M osquery
+initialize_llvmUser() {
+  useradd -d "/home/llvm" -M llvm
   if [[ $? != 0 ]] ; then
-    echo "Failed to create the osquery user"
+    echo "Failed to create the llvm user"
     return 1
   fi
 
-  chown -R osquery:osquery "/home/osquery"
+  chown -R llvm:llvm "/home/llvm"
   if [[ $? != 0 ]] ; then
     echo "Failed to set the require permissions on the home directory"
     return 1

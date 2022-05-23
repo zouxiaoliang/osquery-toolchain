@@ -2,10 +2,10 @@
 # For GCC configurations please look at crosstool-ng-config
 
 # The vendor part has to be changed also in the crosstool-ng-config file
-TUPLE=$MACHINE-osquery-linux-gnu
+TUPLE=$MACHINE-llvm-linux-gnu
 
 ZLIB_VER="1.2.11"
-ZLIB_URL="https://zlib.net/zlib-${ZLIB_VER}.tar.gz"
+ZLIB_URL="https://zlib.net/fossils/zlib-${ZLIB_VER}.tar.gz"
 ZLIB_SHA="c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1"
 
 LLVM_VERSION="11.0.0"
