@@ -35,7 +35,7 @@ startDockerContainer() {
   local container_name="llvm-toolchain-$(git rev-parse HEAD)"
   docker rm "${container_name}" > /dev/null 2>&1
 
-  docker run --rm -e "run_build_script=1" -v "$(realpath build):/opt/llvm-toolchain" -v "$(pwd):/home/llvm/llvm-toolchain" --name "${container_name}" -it "${BASE_IMAGE}" /bin/bash -c '/home/llvm/llvm-toolchain/build_inside_docker.sh'
+  docker run --rm -e "run_build_script=1" -v "$(realpath build):/opt/llvm-toolchain" -v "$(pwd):/home/llvm/llvm-toolchain" -e "https_proxy=http://10.218.0.125:8890" -e "http_proxy=http://10.218.0.125:8890" --name "${container_name}" -it "${BASE_IMAGE}" /bin/bash -c '/home/llvm/llvm-toolchain/build_inside_docker.sh'
   if [[ $? != 0 ]] ; then
     echo "Failed to start the Docker container"
     return 1
@@ -86,7 +86,7 @@ installSystemDependencies() {
     return 1
   fi
 
-  apt-get install g++-8 gcc-8 automake autoconf gettext bison flex unzip help2man libtool-bin libncurses-dev make ninja-build wget git texinfo xz-utils gawk python sudo -y
+  apt-get install g++-8 gcc-8 automake autoconf gettext bison flex unzip help2man libtool-bin libncurses-dev make ninja-build wget git texinfo xz-utils gawk python3 sudo -y
   if [[ $? != 0 ]] ; then
     echo "Failed to install the required dependencies"
     return 1
